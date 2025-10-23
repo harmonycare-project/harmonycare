@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쉬운 그림 퀴즈 게임</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #ecf8e9, #f0f7fb);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Dongle', sans-serif;
+    }
+        h1 {
+            font-size: 50px;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        #question {
+            font-size: 40px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .options {
+    display: flex;
+}
+.option-btn {
+    border: 1px solid #333;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    width: 180px;
+    transition: transform 0.2s, background-color 0.3s, border-color 0.3s;
+    background-color: #fff;
+    font-size: 30px;
+    text-align: center;
+}
+.option-btn:hover {
+    transform: scale(1.05);
+    background-color: #f1f8e9;
+}
+.option-btn img {
+    width: 150px;
+    height: 150px;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+.option-btn svg {
+    width: 150px;
+    height: 150px;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+.option-btn.correct {
+    background-color: #a5d6a7; /* Green */
+    border-color: #4caf50;
+}
+.option-btn.incorrect {
+    background-color: #ef9a9a; /* Red */
+    border-color: #f44336;
+}
+.result-screen {
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+}
+.result-screen button {
+    font-family: 'Dongle', sans-serif;
+    font-size: 30px;
+    padding: 10px 25px;
+    margin-top: 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: #ffd54f;
+    transition: background-color 0.2s;
+}
+    </style>
+</head>
+<body>
+    <h1>쉬운 그림 퀴즈 게임</h1>
+    <div id="question"></div>
+    <div class="options">
+        <div class="option-btn" id="option1" onclick="checkAnswer(1)"></div>
+        <div class="option-btn" id="option2" onclick="checkAnswer(2)"></div>
+        <div class="option-btn" id="option3" onclick="checkAnswer(3)"></div>
+    </div>
+
+    <div id="resultScreen" class="result-screen">
+        <div id="finalScore"></div>
+        <div id="congratulatoryMessage" style="font-size: 30px; margin-top: 10px;"></div>
+        <button onclick="restartGame()">다시하기</button>
+        <button onclick="goHome()">홈으로</button>
+    </div>
+
+<script>
+const allQuestions = [
+    {
+        text: "사과는 무슨 색?",
+        options: ["빨강", "파랑", "보라"],
+        images: ["apple_r.png", "apple_b.png", "apple_purple.png"],
+        answer: 1 // 정답: 빨강 (1번)
+    },
+    {
+        text: "강아지는?",
+        options: ["동물", "과일", "자동차"],
+        images: ["dog.png", "fruit.png", "car.png"],
+        answer: 1 // 정답: 동물 (1번)
+    },
+    {
+        text: "바나나는 무슨 색?",
+        options: ["노랑", "초록", "분홍"],
+        images: ["banana.png", "bananag.png", "bananapink.png"],
+        answer: 1 // 정답: 노랑 (1번)
+    },
+    { 
+        text: "호랑이 그림을 찾으세요", 
+        options: ["호랑이", "사자", "코끼리"], 
+        images: ["tiger.png", "lion.png", "elephant.png"], 
+        answer: 1 
+    },
+    { 
+        text: "돼지 그림을 찾으세요", 
+        options: ["토끼", "돼지", "말"], 
+        images: ["rabbit.png", "pig.png", "horse.png"], 
+        answer: 2 
+    },
+    { 
+        text: "다람쥐 그림을 찾으세요", 
+        options: ["다람쥐", "고양이", "기린"], 
+        images: ["squirrel.png", "cat.png", "giraffe.png"], 
+        answer: 1 
+    },
+    // --- 예시 문제 추가 (여기에 1000개까지 추가 가능) ---
+    {
+        text: "하늘에 떠 있는 것은?",
+        options: ["구름", "나무", "집"],
+        images: ["cloud.png", "tree.png", "house.png"],
+        answer: 1
+    },
+    {
+        text: "물 속에서 사는 것은?",
+        options: ["새", "물고기", "나비"],
+        images: ["bird.png", "fish.png", "butterfly.png"],
+        answer: 2
+    },
+    {
+        text: "신호등의 빨간불은 무엇을 의미할까요?",
+        options: ["가세요", "준비하세요", "멈추세요"],
+        images: [
+            `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#4CAF50" stroke="black" stroke-width="2"/></svg>`, // 초록불
+            `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#FFEB3B" stroke="black" stroke-width="2"/></svg>`, // 노란불
+            `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#F44336" stroke="black" stroke-width="2"/></svg>`  // 빨간불
+        ],
+        answer: 3
+    }
+];
+
+let currentQuiz = [];
+let currentQuestionIndex = 0;
+let score = 0;
+let isAnswerable = true;
+
+const questionEl = document.getElementById("question");
+const optionsEl = document.querySelector(".options");
+const resultScreenEl = document.getElementById("resultScreen");
+
+function initializeQuiz() {
+    // allQuestions 배열을 무작위로 섞습니다. (Fisher-Yates shuffle 알고리즘)
+    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+    // 섞인 배열에서 5개의 문제를 선택합니다.
+    currentQuiz = shuffled.slice(0, 5);
+    
+    loadQuestion();
+}
+
+function loadQuestion() {
+    isAnswerable = true;
+    const q = currentQuiz[currentQuestionIndex];
+    questionEl.innerText = `Q${currentQuestionIndex + 1}. ${q.text}`;
+
+    // 1. 선택지와 정답 정보를 묶어서 배열로 만듭니다.
+    const optionsWithAnswers = q.options.map((optionText, index) => ({
+        text: optionText,
+        image: q.images[index],
+        isCorrect: (index + 1) === q.answer
+    }));
+
+    // 2. 선택지 배열을 무작위로 섞습니다.
+    const shuffledOptions = optionsWithAnswers.sort(() => 0.5 - Math.random());
+
+    // 3. 섞인 선택지를 버튼에 할당합니다.
+    for (let i = 0; i < shuffledOptions.length; i++) {
+        const btn = document.getElementById(`option${i+1}`);
+        const option = shuffledOptions[i];
+        const imageOrSvg = option.image;
+        let imageHtml;
+
+        // 이미지 경로가 SVG 코드인지 확인
+        if (imageOrSvg.trim().startsWith('<svg')) {
+            imageHtml = imageOrSvg;
+        } else {
+            imageHtml = `<img src="${imageOrSvg}" alt="${option.text}">`;
+        }
+        btn.innerHTML = `${imageHtml}<span>${option.text}</span>`;
+        btn.className = 'option-btn'; // Reset classes
+        // 각 버튼에 정답 여부를 data 속성으로 저장합니다.
+        btn.dataset.isCorrect = option.isCorrect;
+    }
+}
+
+function checkAnswer(choice) {
+    if (!isAnswerable) return;
+    isAnswerable = false;
+
+    const q = currentQuiz[currentQuestionIndex];
+    const selectedBtn = document.getElementById(`option${choice}`);
+    
+    // data-is-correct 속성으로 정답을 확인합니다.
+    if (selectedBtn.dataset.isCorrect === 'true') {
+        score++;
+        selectedBtn.classList.add('correct');
+    } else {
+        selectedBtn.classList.add('incorrect');
+        // 모든 버튼을 순회하며 정답 버튼을 찾아서 표시합니다.
+        const optionButtons = document.querySelectorAll('.option-btn');
+        optionButtons.forEach(btn => {
+            if (btn.dataset.isCorrect === 'true') {
+                btn.classList.add('correct');
+            }
+        });
+    }
+
+    setTimeout(() => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex >= currentQuiz.length) {
+            showResult();
+        } else {
+            loadQuestion();
+        }
+    }, 1500); // 1.5초 후 다음 문제로
+}
+
+function showResult() {
+    questionEl.style.display = 'none';
+    optionsEl.style.display = 'none';
+    resultScreenEl.style.display = 'flex';
+    document.getElementById('finalScore').innerText = `총 ${currentQuiz.length}문제 중 ${score}문제를 맞혔어요!`;
+
+    const congratulatoryMessageEl = document.getElementById('congratulatoryMessage');
+    let message = '';
+    let messageColor = '';
+
+    if (score === 5) {
+        message = "완벽해요! 모든 문제를 맞혔어요!";
+        messageColor = '#4CAF50'; // Green
+    } else if (score >= 3) {
+        message = "정말 잘했어요! 훌륭해요!";
+        messageColor = '#2196F3'; // Blue
+    } else if (score >= 1) {
+        message = "잘했어요! 다음엔 더 잘할 수 있을 거예요!";
+        messageColor = '#FFC107'; // Amber
+    } else {
+        message = "괜찮아요! 다시 도전해봐요!";
+        messageColor = '#F44336'; // Red
+    }
+    congratulatoryMessageEl.innerText = message;
+    congratulatoryMessageEl.style.color = messageColor;
+}
+
+function restartGame() {
+    currentQuestionIndex = 0;
+    score = 0;
+    resultScreenEl.style.display = 'none';
+    questionEl.style.display = 'block';
+    optionsEl.style.display = 'flex';
+    initializeQuiz(); // 게임을 다시 시작할 때 새로운 랜덤 문제로 시작
+}
+
+function goHome() {
+    window.location.href = 'main.html';
+}
+
+window.onload = initializeQuiz;
+</script>
+
+</body>
+</html>

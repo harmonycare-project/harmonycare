@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>
+        설정
+    </title>
+    <style>
+        body {
+            background-color: rgb(220, 255, 243);
+        }
+        .nav-buttons {
+      margin-top: auto;
+      margin-bottom: 30px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-buttons button {
+      background-color: #ffe082;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-family: 'Dongle', sans-serif;
+    }
+
+    .nav-buttons button:hover {
+      background-color: #ffd54f;
+    }
+    </style>
+</head>
+<body>
+    <h1>
+        설정
+    </h1>
+    <div class="nav-buttons">
+    <button onclick="goBack()">🔙 뒤로가기</button>
+    <button onclick="goHome()">🏠 홈으로</button>
+  </div>
+
+  <script>
+    function speak(text) {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = 'ko-KR';
+      window.speechSynthesis.speak(msg);
+    }
+
+    function goBack() {
+      history.back();
+    }
+
+    function goHome() {
+      location.href = 'index.html'; // 홈 파일 이름
+    }
+  </script>
+</body>
