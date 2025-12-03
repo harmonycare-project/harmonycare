@@ -1,59 +1,189 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <title>
-        설정
-    </title>
+    <title>설정</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         body {
             background-color: rgb(220, 255, 243);
+            font-family: 'Dongle', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
+
+        h1 {
+            font-size: 50px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .settings-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .setting-label {
+            font-size: 30px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        /* 로그인 정보 스타일 */
+        .user-info-box {
+            background-color: #e0f7fa; /* 연한 하늘색 배경 */
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px dashed #4dd0e1;
+        }
+        .user-name {
+            font-size: 35px;
+            color: #0097a7;
+            font-weight: bold;
+        }
+
+        input[type=range] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: #ffca28;
+        }
+
+        .reset-btn {
+            background-color: #ffab91;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 24px;
+            font-family: 'Dongle', sans-serif;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .reset-btn:hover { background-color: #ff8a65; }
+
         .nav-buttons {
-      margin-top: auto;
-      margin-bottom: 30px;
-      display: flex;
-      gap: 20px;
-    }
+            margin-top: auto;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+        }
 
-    .nav-buttons button {
-      background-color: #ffe082;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-size: 20px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      font-family: 'Dongle', sans-serif;
-    }
+        .nav-buttons button {
+            background-color: #ffe082;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-family: 'Dongle', sans-serif;
+            color: #555;
+        }
 
-    .nav-buttons button:hover {
-      background-color: #ffd54f;
-    }
+        .nav-buttons button:hover {
+            background-color: #ffd54f;
+        }
     </style>
 </head>
 <body>
-    <h1>
-        설정
-    </h1>
+
+    <h1>⚙️ 설 정</h1>
+
+    <div class="settings-container">
+        
+        <div class="setting-item">
+            <div class="setting-label">👤 로그인 정보</div>
+            <div class="user-info-box">
+                <span id="userNameDisplay" class="user-name">불러오는 중...</span> 님
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-label">🗣️ 목소리 속도: <span id="rateValue">1.0</span></div>
+            <input type="range" id="voiceRate" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateRateLabel(this.value)">
+        </div>
+
+        <div class="setting-item">
+            <button class="reset-btn" onclick="resetData()">🗑️ 게임 기록 & 로그인 초기화</button>
+        </div>
+
+    </div>
+
     <div class="nav-buttons">
-    <button onclick="goBack()">🔙 뒤로가기</button>
-    <button onclick="goHome()">🏠 홈으로</button>
-  </div>
+        <button onclick="goBack()">🔙 뒤로가기</button>
+        <button onclick="goHome()">🏠 홈으로</button>
+    </div>
 
-  <script>
-    function speak(text) {
-      const msg = new SpeechSynthesisUtterance(text);
-      msg.lang = 'ko-KR';
-      window.speechSynthesis.speak(msg);
-    }
+    <script>
+        let speechRate = 1.0;
 
-    function goBack() {
-      history.back();
-    }
+        // 페이지 로드 시 사용자 이름 불러오기
+        window.onload = function() {
+            // 앞선 로그인 페이지에서 'username'이라는 키로 이름을 저장했다고 가정합니다.
+            const savedName = localStorage.getItem('username');
+            
+            const nameDisplay = document.getElementById('userNameDisplay');
+            if (savedName) {
+                nameDisplay.innerText = savedName;
+            } else {
+                nameDisplay.innerText = "방문자"; // 로그인 정보가 없을 때
+            }
+        };
 
-    function goHome() {
-      location.href = 'index.html'; // 홈 파일 이름
-    }
-  </script>
+        function updateRateLabel(val) {
+            document.getElementById('rateValue').innerText = val;
+            speechRate = val;
+        }
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ko-KR';
+            msg.rate = speechRate; 
+            window.speechSynthesis.speak(msg);
+        }
+
+        // 초기화 함수
+        function resetData() {
+            if(confirm("정말로 모든 기록과 로그인 정보를 삭제하시겠습니까?")) {
+                localStorage.clear(); // 저장된 모든 데이터 삭제
+                
+                alert("초기화 되었습니다! 홈으로 이동합니다.");
+                speak("초기화 되었습니다.");
+                
+                // 정보가 지워졌으니 홈이나 로그인 화면으로 보내는 것이 자연스럽습니다.
+                setTimeout(() => {
+                    location.href = 'index.html'; 
+                }, 1000);
+            }
+        }
+
+        function goBack() {
+            history.back();
+        }
+
+        function goHome() {
+            location.href = 'index.html'; 
+        }
+    </script>
 </body>
+</html>
