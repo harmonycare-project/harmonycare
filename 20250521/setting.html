@@ -10,7 +10,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100vh; /* 화면 전체 높이 사용 */
+            height: 100vh;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
@@ -49,7 +49,7 @@
 
         /* 👤 로그인 정보 박스 스타일 */
         .user-info-box {
-            background-color: #e0f7fa; /* 연한 하늘색 */
+            background-color: #e0f7fa;
             padding: 20px;
             border-radius: 15px;
             text-align: center;
@@ -58,7 +58,7 @@
         
         .user-name {
             font-size: 40px;
-            color: #00838f; /* 진한 청록색 텍스트 */
+            color: #00838f;
             font-weight: bold;
             display: block;
             margin-bottom: 5px;
@@ -93,7 +93,7 @@
 
         /* 하단 네비게이션 버튼 */
         .nav-buttons {
-            margin-top: auto; /* 화면 아래쪽으로 밀기 */
+            margin-top: auto;
             margin-bottom: 30px;
             display: flex;
             gap: 20px;
@@ -147,30 +147,28 @@
         // 변수 설정
         let speechRate = 1.0;
         
-        // ★ 핵심: 사용자가 알려준 키 값 적용
-        const nameKey = 'harmonyUsername'; 
-
-        // 1. 페이지가 로드될 때 실행
-        window.onload = function() {
-            // 저장소에서 'harmonyUsername'을 찾아서 가져옴
-            const savedName = localStorage.getItem(nameKey);
+        // 1. 페이지 로드 시 이름 가져오기 (name.js의 로직을 여기에 맞게 적용)
+        window.addEventListener('DOMContentLoaded', () => {
+            // name.js에서 쓰는 키값 그대로 사용
+            const name = localStorage.getItem('harmonyUsername');
             
+            // 설정 페이지에 있는 이름 표시 칸 가져오기
             const nameDisplay = document.getElementById('userNameDisplay');
-            
-            if (savedName) {
-                nameDisplay.innerText = savedName; // 찾은 이름 표시
-            } else {
-                nameDisplay.innerText = "방문자"; // 없으면 방문자로 표시
-            }
-        };
 
-        // 2. 목소리 속도 슬라이더 조절 시
+            if (name && nameDisplay) {
+                nameDisplay.textContent = name; // 이름 표시
+            } else if (nameDisplay) {
+                nameDisplay.textContent = "방문자"; // 이름이 없을 때
+            }
+        });
+
+        // 2. 목소리 속도 조절
         function updateRateLabel(val) {
             document.getElementById('rateValue').innerText = val;
             speechRate = val;
         }
 
-        // 3. 말하기 함수 (테스트용)
+        // 3. 말하기 함수
         function speak(text) {
             window.speechSynthesis.cancel();
             const msg = new SpeechSynthesisUtterance(text);
@@ -179,23 +177,21 @@
             window.speechSynthesis.speak(msg);
         }
 
-        // 4. 초기화 버튼 클릭 시
+        // 4. 초기화 함수
         function resetData() {
             if(confirm("정말로 모든 기록과 로그인 정보를 지우시겠습니까?")) {
                 localStorage.clear(); // 모든 저장 데이터 삭제
                 alert("초기화 되었습니다. 첫 화면으로 이동합니다.");
                 
-                // 보통 로그인 화면인 index.html로 이동
+                // 홈(로그인) 화면 파일명
                 location.href = 'index.html'; 
             }
         }
 
-        // 뒤로가기
         function goBack() {
             history.back();
         }
 
-        // 홈으로 이동
         function goHome() {
             location.href = 'index.html'; 
         }
