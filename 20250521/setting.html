@@ -10,7 +10,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100vh;
+            height: 100vh; /* 화면 전체 높이 사용 */
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
@@ -22,6 +22,7 @@
             margin-bottom: 20px;
         }
 
+        /* 흰색 설정 박스 */
         .settings-container {
             background-color: white;
             padding: 30px;
@@ -46,41 +47,53 @@
             color: #666;
         }
 
-        /* 로그인 정보 스타일 */
+        /* 👤 로그인 정보 박스 스타일 */
         .user-info-box {
-            background-color: #e0f7fa; /* 연한 하늘색 배경 */
-            padding: 15px;
+            background-color: #e0f7fa; /* 연한 하늘색 */
+            padding: 20px;
             border-radius: 15px;
             text-align: center;
-            border: 2px dashed #4dd0e1;
+            border: 2px dashed #26c6da;
         }
+        
         .user-name {
-            font-size: 35px;
-            color: #0097a7;
+            font-size: 40px;
+            color: #00838f; /* 진한 청록색 텍스트 */
             font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
         }
 
+        .user-status {
+            font-size: 24px;
+            color: #555;
+        }
+
+        /* 슬라이더 스타일 */
         input[type=range] {
             width: 100%;
             cursor: pointer;
             accent-color: #ffca28;
         }
 
+        /* 초기화 버튼 */
         .reset-btn {
             background-color: #ffab91;
             color: white;
             border: none;
             border-radius: 10px;
-            padding: 10px;
-            font-size: 24px;
+            padding: 15px;
+            font-size: 26px;
             font-family: 'Dongle', sans-serif;
             cursor: pointer;
-            margin-top: 10px;
+            width: 100%;
+            transition: background 0.3s;
         }
-        .reset-btn:hover { background-color: #ff8a65; }
+        .reset-btn:hover { background-color: #ff7043; }
 
+        /* 하단 네비게이션 버튼 */
         .nav-buttons {
-            margin-top: auto;
+            margin-top: auto; /* 화면 아래쪽으로 밀기 */
             margin-bottom: 30px;
             display: flex;
             gap: 20px;
@@ -90,18 +103,14 @@
             background-color: #ffe082;
             border: none;
             border-radius: 10px;
-            padding: 10px 20px;
+            padding: 10px 25px;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
             font-family: 'Dongle', sans-serif;
             color: #555;
         }
-
-        .nav-buttons button:hover {
-            background-color: #ffd54f;
-        }
+        .nav-buttons button:hover { background-color: #ffd54f; }
     </style>
 </head>
 <body>
@@ -111,9 +120,10 @@
     <div class="settings-container">
         
         <div class="setting-item">
-            <div class="setting-label">👤 로그인 정보</div>
+            <div class="setting-label">👤 현재 사용자</div>
             <div class="user-info-box">
-                <span id="userNameDisplay" class="user-name">불러오는 중...</span> 님
+                <span id="userNameDisplay" class="user-name"></span> 
+                <span class="user-status">님, 환영합니다!</span>
             </div>
         </div>
 
@@ -123,37 +133,44 @@
         </div>
 
         <div class="setting-item">
-            <button class="reset-btn" onclick="resetData()">🗑️ 게임 기록 & 로그인 초기화</button>
+            <button class="reset-btn" onclick="resetData()">🗑️ 처음 상태로 되돌리기</button>
         </div>
 
     </div>
 
     <div class="nav-buttons">
-        <button onclick="goBack()">🔙 뒤로가기</button>
+        <button onclick="goBack()">🔙 뒤로</button>
         <button onclick="goHome()">🏠 홈으로</button>
     </div>
 
     <script>
+        // 변수 설정
         let speechRate = 1.0;
+        
+        // ★ 핵심: 사용자가 알려준 키 값 적용
+        const nameKey = 'harmonyUsername'; 
 
-        // 페이지 로드 시 사용자 이름 불러오기
+        // 1. 페이지가 로드될 때 실행
         window.onload = function() {
-            // 앞선 로그인 페이지에서 'username'이라는 키로 이름을 저장했다고 가정합니다.
-            const savedName = localStorage.getItem('username');
+            // 저장소에서 'harmonyUsername'을 찾아서 가져옴
+            const savedName = localStorage.getItem(nameKey);
             
             const nameDisplay = document.getElementById('userNameDisplay');
+            
             if (savedName) {
-                nameDisplay.innerText = savedName;
+                nameDisplay.innerText = savedName; // 찾은 이름 표시
             } else {
-                nameDisplay.innerText = "방문자"; // 로그인 정보가 없을 때
+                nameDisplay.innerText = "방문자"; // 없으면 방문자로 표시
             }
         };
 
+        // 2. 목소리 속도 슬라이더 조절 시
         function updateRateLabel(val) {
             document.getElementById('rateValue').innerText = val;
             speechRate = val;
         }
 
+        // 3. 말하기 함수 (테스트용)
         function speak(text) {
             window.speechSynthesis.cancel();
             const msg = new SpeechSynthesisUtterance(text);
@@ -162,25 +179,23 @@
             window.speechSynthesis.speak(msg);
         }
 
-        // 초기화 함수
+        // 4. 초기화 버튼 클릭 시
         function resetData() {
-            if(confirm("정말로 모든 기록과 로그인 정보를 삭제하시겠습니까?")) {
-                localStorage.clear(); // 저장된 모든 데이터 삭제
+            if(confirm("정말로 모든 기록과 로그인 정보를 지우시겠습니까?")) {
+                localStorage.clear(); // 모든 저장 데이터 삭제
+                alert("초기화 되었습니다. 첫 화면으로 이동합니다.");
                 
-                alert("초기화 되었습니다! 홈으로 이동합니다.");
-                speak("초기화 되었습니다.");
-                
-                // 정보가 지워졌으니 홈이나 로그인 화면으로 보내는 것이 자연스럽습니다.
-                setTimeout(() => {
-                    location.href = 'index.html'; 
-                }, 1000);
+                // 보통 로그인 화면인 index.html로 이동
+                location.href = 'index.html'; 
             }
         }
 
+        // 뒤로가기
         function goBack() {
             history.back();
         }
 
+        // 홈으로 이동
         function goHome() {
             location.href = 'index.html'; 
         }
