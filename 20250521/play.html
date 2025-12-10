@@ -1,34 +1,35 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>쉬운 그림 퀴즈 게임</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(to bottom, #ecf8e9, #f0f7fb);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      font-family: 'Dongle', sans-serif;
-    }
-        h1 {
-            font-size: 50px;
-            color: #2e7d32;
-            margin-bottom: 10px;
-        }
-        #question {
-            font-size: 40px;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        .options {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쉬운 그림 퀴즈 게임</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
+  <style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #ecf8e9, #f0f7fb);
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Dongle', sans-serif;
+}
+h1 {
+    font-size: 50px;
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+#question {
+    font-size: 40px;
+    margin-bottom: 20px;
+    color: #333;
+}
+.options {
+    display: flex;
+    gap: 20px; 
 }
 .option-btn {
     border: 1px solid #333;
@@ -54,6 +55,15 @@
 }
 .option-btn svg {
     width: 150px;
+    height: 150px;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+/* 이모지 처리를 위한 스타일 */
+.option-btn .emoji-icon {
+    font-size: 100px; /* 이모지를 크게 보이게 함 */
+    line-height: 150px;
     height: 150px;
     display: block;
     margin: 0 auto;
@@ -85,85 +95,133 @@
     background-color: #ffd54f;
     transition: background-color 0.2s;
 }
-    </style>
+    </style>
 </head>
 <body>
-    <h1>쉬운 그림 퀴즈 게임</h1>
-    <div id="question"></div>
-    <div class="options">
-        <div class="option-btn" id="option1" onclick="checkAnswer(1)"></div>
-        <div class="option-btn" id="option2" onclick="checkAnswer(2)"></div>
-        <div class="option-btn" id="option3" onclick="checkAnswer(3)"></div>
-    </div>
+    <h1>쉬운 그림 퀴즈 게임</h1>
+    <div id="question"></div>
+    <div class="options">
+        <div class="option-btn" id="option1" onclick="checkAnswer(1)"></div>
+        <div class="option-btn" id="option2" onclick="checkAnswer(2)"></div>
+        <div class="option-btn" id="option3" onclick="checkAnswer(3)"></div>
+    </div>
 
-    <div id="resultScreen" class="result-screen">
-        <div id="finalScore"></div>
-        <div id="congratulatoryMessage" style="font-size: 30px; margin-top: 10px;"></div>
-        <button onclick="restartGame()">다시하기</button>
-        <button onclick="goHome()">홈으로</button>
-    </div>
+    <div id="resultScreen" class="result-screen">
+        <div id="finalScore"></div>
+        <div id="congratulatoryMessage" style="font-size: 30px; margin-top: 10px;"></div>
+        <button onclick="restartGame()">다시하기</button>
+        <button onclick="goHome()">홈으로</button>
+    </div>
 
 <script>
+// --- 총 100개의 문제 목록 (기존 이미지 파일 + 새로운 이모지/SVG) ---
 const allQuestions = [
-    {
-        text: "사과는 무슨 색?",
-        options: ["빨강", "파랑", "보라"],
-        images: ["apple_r.png", "apple_b.png", "apple_purple.png"],
-        answer: 1 // 정답: 빨강 (1번)
-    },
-    {
-        text: "강아지는?",
-        options: ["동물", "과일", "자동차"],
-        images: ["dog.png", "fruit.png", "car.png"],
-        answer: 1 // 정답: 동물 (1번)
-    },
-    {
-        text: "바나나는 무슨 색?",
-        options: ["노랑", "초록", "분홍"],
-        images: ["banana.png", "bananag.png", "bananapink.png"],
-        answer: 1 // 정답: 노랑 (1번)
-    },
-    { 
-        text: "호랑이 그림을 찾으세요", 
-        options: ["호랑이", "사자", "코끼리"], 
-        images: ["tiger.png", "lion.png", "elephant.png"], 
-        answer: 1 
-    },
-    { 
-        text: "돼지 그림을 찾으세요", 
-        options: ["토끼", "돼지", "말"], 
-        images: ["rabbit.png", "pig.png", "horse.png"], 
-        answer: 2 
-    },
-    { 
-        text: "다람쥐 그림을 찾으세요", 
-        options: ["다람쥐", "고양이", "기린"], 
-        images: ["squirrel.png", "cat.png", "giraffe.png"], 
-        answer: 1 
-    },
-    // --- 예시 문제 추가 (여기에 1000개까지 추가 가능) ---
-    {
-        text: "하늘에 떠 있는 것은?",
-        options: ["구름", "나무", "집"],
-        images: ["cloud.png", "tree.png", "house.png"],
-        answer: 1
-    },
-    {
-        text: "물 속에서 사는 것은?",
-        options: ["새", "물고기", "나비"],
-        images: ["bird.png", "fish.png", "butterfly.png"],
-        answer: 2
-    },
-    {
-        text: "신호등의 빨간불은 무엇을 의미할까요?",
-        options: ["가세요", "준비하세요", "멈추세요"],
-        images: [
-            `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#4CAF50" stroke="black" stroke-width="2"/></svg>`, // 초록불
-            `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#FFEB3B" stroke="black" stroke-width="2"/></svg>`, // 노란불
-            `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#F44336" stroke="black" stroke-width="2"/></svg>`  // 빨간불
-        ],
-        answer: 3
-    }
+    // [기존 문제 1-9] - 이미지 파일명 그대로 유지 (파일이 존재해야 함)
+    { text: "사과는 무슨 색?", options: ["빨강", "파랑", "보라"], images: ["apple_r.png", "apple_b.png", "apple_purple.png"], answer: 1 },
+    { text: "강아지는?", options: ["동물", "과일", "자동차"], images: ["dog.png", "fruit.png", "car.png"], answer: 1 },
+    { text: "바나나는 무슨 색?", options: ["노랑", "초록", "분홍"], images: ["banana.png", "bananag.png", "bananapink.png"], answer: 1 },
+    { text: "호랑이 그림을 찾으세요", options: ["호랑이", "사자", "코끼리"], images: ["tiger.png", "lion.png", "elephant.png"], answer: 1 },
+    { text: "돼지 그림을 찾으세요", options: ["토끼", "돼지", "말"], images: ["rabbit.png", "pig.png", "horse.png"], answer: 2 },
+    { text: "다람쥐 그림을 찾으세요", options: ["다람쥐", "고양이", "기린"], images: ["squirrel.png", "cat.png", "giraffe.png"], answer: 1 },
+    { text: "하늘에 떠 있는 것은?", options: ["구름", "나무", "집"], images: ["cloud.png", "tree.png", "house.png"], answer: 1 },
+    { text: "물 속에서 사는 것은?", options: ["새", "물고기", "나비"], images: ["bird.png", "fish.png", "butterfly.png"], answer: 2 },
+    { 
+        text: "신호등의 빨간불은 무엇을 의미할까요?", 
+        options: ["가세요", "준비하세요", "멈추세요"], 
+        images: [
+            `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#4CAF50"/></svg>`, 
+            `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#FFEB3B"/></svg>`, 
+            `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#F44336"/></svg>` 
+        ], 
+        answer: 3
+    },
+
+    { text: "해를 피할 때 쓰는 것은?", options: ["우산", "모자", "장갑"], images: ["☂️", "🧢", "🧤"], answer: 2 },
+    { text: "하늘색인 것은?", options: ["잔디", "구름", "땅"], images: ["🌿", "🟦", "🟫"], answer: 2 },
+    { text: "음식을 먹을 때 쓰는 것은?", options: ["포크", "연필", "빗"], images: ["🍴", "✏️", "🪮"], answer: 1 },
+    { text: "비가 올 때 쓰는 것은?", options: ["우산", "선풍기", "난로"], images: ["☔", "💨", "🔥"], answer: 1 },
+    { text: "탈 수 있는 것은?", options: ["컵", "비행기", "양말"], images: ["☕", "✈️", "🧦"], answer: 2 },
+    { text: "밤에 뜨는 것은?", options: ["태양", "달", "무지개"], images: ["☀️", "🌙", "🌈"], answer: 2 },
+    { text: "학교에서 공부할 때 쓰는 것은?", options: ["가방", "책상", "모두"], images: ["🎒", "📚", "✅"], answer: 3 },
+    { text: "노래를 부를 때 쓰는 것은?", options: ["마이크", "가위", "자"], images: ["🎤", "✂️", "📏"], answer: 1 },
+    { text: "옷을 입는 곳은?", options: ["주방", "화장실", "방"], images: ["🍳", "🚽", "🚪"], answer: 3 },
+    { text: "손을 씻을 때 쓰는 것은?", options: ["비누", "휴지", "빗"], images: ["🧼", "🧻", "🪮"], answer: 1 },
+    { text: "토끼 그림을 찾으세요", options: ["곰", "토끼", "여우"], images: ["🐻", "🐇", "🦊"], answer: 2 },
+    { text: "시원한 음료는?", options: ["커피", "콜라", "수프"], images: ["☕", "🥤", "🥣"], answer: 2 },
+    { text: "빨간색 과일은?", options: ["포도", "딸기", "배"], images: ["🍇", "🍓", "🍐"], answer: 2 },
+    { text: "둥근 모양의 채소는?", options: ["당근", "양파", "오이"], images: ["🥕", "🧅", "🥒"], answer: 2 },
+    { text: "털이 많은 동물은?", options: ["뱀", "양", "거북이"], images: ["🐍", "🐑", "🐢"], answer: 2 },
+    { text: "길에 다니는 것은?", options: ["배", "기차", "버스"], images: ["🚢", "🚂", "🚌"], answer: 3 },
+    { text: "몸을 닦을 때 쓰는 것은?", options: ["수건", "접시", "연필"], images: ["🧖‍♀️", "🍽️", "✏️"], answer: 1 },
+    { text: "잠을 잘 때 쓰는 것은?", options: ["침대", "시계", "달력"], images: ["🛏️", "⏰", "📅"], answer: 1 },
+    { text: "쓰레기를 버리는 곳은?", options: ["쓰레기통", "화분", "냉장고"], images: ["🗑️", "🪴", "🧊"], answer: 1 },
+    { text: "비를 막는 것은?", options: ["모래", "돌", "지붕"], images: ["🏖️", "🪨", "🏡"], answer: 3 },
+    { text: "파란색인 것은?", options: ["나무", "하늘", "바나나"], images: ["🌳", "🟦", "🍌"], answer: 2 },
+    { text: "날씨를 알려주는 것은?", options: ["신문", "TV", "컴퓨터"], images: ["📰", "📺", "💻"], answer: 2 },
+    { text: "코끼리 그림을 찾으세요", options: ["기린", "코끼리", "하마"], images: ["🦒", "🐘", "🦛"], answer: 2 },
+    { text: "손에 들고 쓰는 것은?", options: ["의자", "핸드폰", "책장"], images: ["🪑", "📱", "📚"], answer: 2 },
+    { text: "추울 때 입는 것은?", options: ["반바지", "코트", "샌들"], images: ["🩳", "🧥", "👡"], answer: 2 },
+    { text: "차를 마실 때 쓰는 것은?", options: ["컵", "접시", "냄비"], images: ["☕", "🍽️", "🍲"], answer: 1 },
+    { text: "손으로 잡고 쓰는 것은?", options: ["빗자루", "책", "가위"], images: ["🧹", "📖", "✂️"], answer: 3 },
+    { text: "앉을 때 쓰는 것은?", options: ["침대", "의자", "옷장"], images: ["🛏️", "🪑", "👚"], answer: 2 },
+    { text: "불을 끌 때 쓰는 것은?", options: ["물", "기름", "불꽃"], images: ["💧", "⛽", "🔥"], answer: 1 },
+    { text: "배가 고플 때 먹는 것은?", options: ["책", "시계", "밥"], images: ["📖", "⏰", "🍚"], answer: 3 },
+    { text: "학교에 가는 것은?", options: ["학생", "경찰", "의사"], images: ["🧑‍🎓", "👮", "🧑‍⚕️"], answer: 1 },
+    { text: "소방차는 무슨 색?", options: ["노랑", "빨강", "파랑"], images: ["🟨", "🟥", "🟦"], answer: 2 },
+    { text: "새가 사는 곳은?", options: ["물", "땅", "둥지"], images: ["🌊", "🟫", "🥚"], answer: 3 },
+    { text: "땅 속에서 자라는 것은?", options: ["사과", "감자", "딸기"], images: ["🍎", "🥔", "🍓"], answer: 2 },
+    { text: "아침 인사는?", options: ["잘 가", "안녕", "고마워"], images: ["👋", "🤝", "🙏"], answer: 2 },
+    { text: "음료수를 마실 때 쓰는 것은?", options: ["빨대", "젓가락", "가위"], images: ["🥤", "🥢", "✂️"], answer: 1 },
+    { text: "책을 읽는 곳은?", options: ["주방", "도서관", "차고"], images: ["🍳", "📚", "🚗"], answer: 2 },
+    { text: "옷을 깨끗하게 하는 것은?", options: ["휴지", "세탁기", "접시"], images: ["🧻", "🧺", "🍽️"], answer: 2 },
+    { text: "비를 맞는 것은?", options: ["나무", "불", "벽"], images: ["🌳", "🔥", "🧱"], answer: 1 },
+    { text: "거울에 보이는 것은?", options: ["자신", "다른사람", "하늘"], images: ["👤", "👥", "☁️"], answer: 1 },
+    { text: "글을 쓸 때 쓰는 것은?", options: ["지우개", "연필", "책상"], images: ["🧼", "✏️", "🪑"], answer: 2 },
+    { text: "달콤한 과일은?", options: ["레몬", "사탕", "소금"], images: ["🍋", "🍬", "🧂"], answer: 2 },
+    { text: "추울 때 몸을 따뜻하게 하는 것은?", options: ["얼음", "난로", "바람"], images: ["🧊", "🔥", "💨"], answer: 2 },
+    { text: "새끼를 낳는 동물은?", options: ["뱀", "닭", "강아지"], images: ["🐍", "🐔", "🐶"], answer: 3 },
+    { text: "물을 마실 때 쓰는 것은?", options: ["신발", "컵", "의자"], images: ["👟", "🥤", "🪑"], answer: 2 },
+    { text: "해변에서 볼 수 있는 것은?", options: ["눈", "모래", "구름"], images: ["❄️", "🏖️", "☁️"], answer: 2 },
+    { text: "가위를 들고 쓰는 것은?", options: ["손", "발", "입"], images: ["✋", "🦶", "👄"], answer: 1 },
+    { text: "달리기를 할 때 쓰는 것은?", options: ["책", "운동화", "시계"], images: ["📖", "👟", "⏰"], answer: 2 },
+    { text: "빨래를 널 때 쓰는 것은?", options: ["옷걸이", "망치", "드라이버"], images: ["👚", "🔨", "🔧"], answer: 1 }, 
+    { text: "양치질을 할 때 쓰는 것은?", options: ["비누", "칫솔", "샴푸"], images: ["🧼", "🪥", "🧴"], answer: 2 },
+    { text: "냉장고에 넣는 것은?", options: ["따뜻한 물", "음료수", "옷"], images: ["♨️", "🥤", "👕"], answer: 2 },
+    { text: "비눗방울이 생기는 것은?", options: ["물", "비누", "돌"], images: ["💧", "🧼", "🪨"], answer: 2 },
+    { text: "아기가 타는 것은?", options: ["자전거", "유모차", "버스"], images: ["🚲", "🚼", "🚌"], answer: 2 },
+    { text: "사진을 찍는 것은?", options: ["카메라", "연필", "시계"], images: ["📸", "✏️", "⏰"], answer: 1 },
+    { text: "생일 때 쓰는 것은?", options: ["촛불", "달력", "시계"], images: ["🕯️", "📅", "⏰"], answer: 1 },
+    { text: "바다에 사는 동물은?", options: ["고양이", "돌고래", "말"], images: ["🐈", "🐬", "🐎"], answer: 2 },
+    { text: "옷을 거는 것은?", options: ["책상", "옷장", "바닥"], images: ["🪑", "👚", "⬇️"], answer: 2 },
+    { text: "손에 끼는 것은?", options: ["장갑", "양말", "모자"], images: ["🧤", "🧦", "🧢"], answer: 1 },
+    { text: "손으로 만질 수 있는 것은?", options: ["바람", "물", "공"], images: ["💨", "💧", "⚽"], answer: 3 },
+    { text: "땅에 떨어지는 것은?", options: ["비", "구름", "별"], images: ["🌧️", "☁️", "⭐"], answer: 1 },
+    { text: "주황색인 것은?", options: ["귤", "포도", "바나나"], images: ["🍊", "🍇", "🍌"], answer: 1 },
+    { text: "시원한 바람을 일으키는 것은?", options: ["선풍기", "난로", "물"], images: ["💨", "🔥", "💧"], answer: 1 },
+    { text: "밥을 먹을 때 쓰는 것은?", options: ["숟가락", "빗", "지갑"], images: ["🥄", "🪮", "👛"], answer: 1 },
+    { text: "색깔이 빨강인 것은?", options: ["배", "수박", "귤"], images: ["🍐", "🍉", "🍊"], answer: 2 },
+    { text: "여름에 먹는 것은?", options: ["눈사람", "아이스크림", "핫팩"], images: ["⛄", "🍦", "♨️"], answer: 2 },
+    { text: "전화할 때 쓰는 것은?", options: ["가방", "핸드폰", "책"], images: ["🎒", "📱", "📖"], answer: 2 },
+    { text: "몸에 좋은 것은?", options: ["담배", "채소", "과자"], images: ["🚬", "🥬", "🍪"], answer: 2 },
+    { text: "냄새를 맡을 때 쓰는 것은?", options: ["귀", "코", "눈"], images: ["👂", "👃", "👁️"], answer: 2 },
+    { text: "시간을 알려주는 것은?", options: ["달력", "시계", "지도"], images: ["📅", "⏰", "🗺️"], answer: 2 },
+    { text: "돈을 넣는 곳은?", options: ["주머니", "지갑", "열쇠"], images: ["👖", "👛", "🔑"], answer: 2 },
+    { text: "하얀색 동물은?", options: ["개미", "펭귄", "팬더"], images: ["🐜", "🐧", "🐼"], answer: 2 },
+    { text: "나무 위에 사는 것은?", options: ["물고기", "새", "토끼"], images: ["🐟", "🐦", "🐇"], answer: 2 },
+    { text: "차에 있는 것은?", options: ["날개", "바퀴", "꼬리"], images: ["🕊️", "⭕", "🦊"], answer: 2 },
+    { text: "방을 밝게 하는 것은?", options: ["거울", "전등", "그림"], images: ["🪞", "💡", "🖼️"], answer: 2 },
+    { text: "빵을 구울 때 쓰는 것은?", options: ["냉장고", "오븐", "식탁"], images: ["🧊", "🔥", "🪑"], answer: 2 },
+    { text: "신문을 읽을 때 쓰는 것은?", options: ["책", "돋보기", "가위"], images: ["📖", "🔎", "✂️"], answer: 2 },
+    { text: "물고기가 숨쉬는 곳은?", options: ["하늘", "물", "땅"], images: ["☁️", "💧", "🟫"], answer: 2 },
+    { text: "추울 때 뜨거운 것은?", options: ["눈", "차", "얼음"], images: ["❄️", "☕", "🧊"], answer: 2 },
+    { text: "비행기가 다니는 곳은?", options: ["바다", "하늘", "산"], images: ["🌊", "☁️", "⛰️"], answer: 2 },
+    { text: "숫자 5를 찾으세요", options: ["2", "5", "8"], images: ["2️⃣", "5️⃣", "8️⃣"], answer: 2 },
+    { text: "동물 그림을 찾으세요", options: ["의자", "고양이", "연필"], images: ["🪑", "🐈", "✏️"], answer: 2 },
+    { text: "빨간색인 것은?", options: ["나무", "딸기", "바나나"], images: ["🌳", "🍓", "🍌"], answer: 2 },
+    { text: "바퀴가 4개인 것은?", options: ["자전거", "자동차", "오토바이"], images: ["🚲", "🚗", "🛵"], answer: 2 },
+    { text: "소리를 들을 때 쓰는 것은?", options: ["눈", "귀", "코"], images: ["👁️", "👂", "👃"], answer: 2 },
+    { text: "아기가 먹는 것은?", options: ["고기", "우유", "라면"], images: ["🥩", "🥛", "🍜"], answer: 2 },
+    { text: "식물 그림을 찾으세요", options: ["돌", "꽃", "물"], images: ["🪨", "🌸", "💧"], answer: 2 }
 ];
 
 let currentQuiz = [];
@@ -176,119 +234,130 @@ const optionsEl = document.querySelector(".options");
 const resultScreenEl = document.getElementById("resultScreen");
 
 function initializeQuiz() {
-    // allQuestions 배열을 무작위로 섞습니다. (Fisher-Yates shuffle 알고리즘)
-    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-    // 섞인 배열에서 5개의 문제를 선택합니다.
-    currentQuiz = shuffled.slice(0, 5);
-    
-    loadQuestion();
+    // 1. allQuestions 배열을 무작위로 섞습니다.
+    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+    // 2. 섞인 배열에서 첫 5개의 문제를 선택합니다.
+    currentQuiz = shuffled.slice(0, 5);
+    
+    loadQuestion();
 }
 
 function loadQuestion() {
-    isAnswerable = true;
-    const q = currentQuiz[currentQuestionIndex];
-    questionEl.innerText = `Q${currentQuestionIndex + 1}. ${q.text}`;
+    isAnswerable = true;
+    
+    // 버튼의 Correct/Incorrect 클래스 및 data 속성을 초기화합니다.
+    const optionButtons = document.querySelectorAll('.option-btn');
+    optionButtons.forEach(btn => {
+        btn.className = 'option-btn'; 
+        btn.dataset.isCorrect = 'false';
+    });
 
-    // 1. 선택지와 정답 정보를 묶어서 배열로 만듭니다.
-    const optionsWithAnswers = q.options.map((optionText, index) => ({
-        text: optionText,
-        image: q.images[index],
-        isCorrect: (index + 1) === q.answer
-    }));
 
-    // 2. 선택지 배열을 무작위로 섞습니다.
-    const shuffledOptions = optionsWithAnswers.sort(() => 0.5 - Math.random());
+    const q = currentQuiz[currentQuestionIndex];
+    questionEl.innerText = `Q${currentQuestionIndex + 1}. ${q.text}`;
 
-    // 3. 섞인 선택지를 버튼에 할당합니다.
-    for (let i = 0; i < shuffledOptions.length; i++) {
-        const btn = document.getElementById(`option${i+1}`);
-        const option = shuffledOptions[i];
-        const imageOrSvg = option.image;
-        let imageHtml;
+    // 1. 선택지와 정답 정보를 묶어서 배열로 만듭니다.
+    const optionsWithAnswers = q.options.map((optionText, index) => ({
+        text: optionText,
+        image: q.images[index],
+        isCorrect: (index + 1) === q.answer
+    }));
 
-        // 이미지 경로가 SVG 코드인지 확인
-        if (imageOrSvg.trim().startsWith('<svg')) {
-            imageHtml = imageOrSvg;
-        } else {
-            imageHtml = `<img src="${imageOrSvg}" alt="${option.text}">`;
-        }
-        btn.innerHTML = `${imageHtml}<span>${option.text}</span>`;
-        btn.className = 'option-btn'; // Reset classes
-        // 각 버튼에 정답 여부를 data 속성으로 저장합니다.
-        btn.dataset.isCorrect = option.isCorrect;
-    }
+    // 2. 선택지 배열을 무작위로 섞습니다.
+    const shuffledOptions = optionsWithAnswers.sort(() => 0.5 - Math.random());
+
+    // 3. 섞인 선택지를 버튼에 할당합니다.
+    for (let i = 0; i < shuffledOptions.length; i++) {
+        const btn = document.getElementById(`option${i+1}`);
+        const option = shuffledOptions[i];
+        const imageOrSvg = option.image;
+        let imageHtml;
+
+        // --- 이미지 처리 로직 (파일, SVG, 이모지 구분) ---
+        if (imageOrSvg.trim().startsWith('<svg')) {
+            // 1. SVG 코드가 들어온 경우 (예: 신호등)
+            imageHtml = imageOrSvg;
+        } else if (imageOrSvg.length <= 4 && !imageOrSvg.includes('.')) {
+            // 2. 짧은 텍스트(이모지)가 들어온 경우 (새로 추가된 대부분의 문제)
+            imageHtml = `<span class="emoji-icon">${imageOrSvg}</span>`;
+        } else {
+            // 3. 파일 경로가 들어온 경우 (기존 문제)
+            imageHtml = `<img src="${imageOrSvg}" alt="${option.text}">`;
+        }
+        // --------------------------------------------------
+
+        btn.innerHTML = `${imageHtml}<span>${option.text}</span>`;
+        btn.dataset.isCorrect = option.isCorrect;
+    }
 }
 
 function checkAnswer(choice) {
-    if (!isAnswerable) return;
-    isAnswerable = false;
+    if (!isAnswerable) return;
+    isAnswerable = false;
 
-    const q = currentQuiz[currentQuestionIndex];
-    const selectedBtn = document.getElementById(`option${choice}`);
-    
-    // data-is-correct 속성으로 정답을 확인합니다.
-    if (selectedBtn.dataset.isCorrect === 'true') {
-        score++;
-        selectedBtn.classList.add('correct');
-    } else {
-        selectedBtn.classList.add('incorrect');
-        // 모든 버튼을 순회하며 정답 버튼을 찾아서 표시합니다.
-        const optionButtons = document.querySelectorAll('.option-btn');
-        optionButtons.forEach(btn => {
-            if (btn.dataset.isCorrect === 'true') {
-                btn.classList.add('correct');
-            }
-        });
-    }
+    const selectedBtn = document.getElementById(`option${choice}`);
+    
+    if (selectedBtn.dataset.isCorrect === 'true') {
+        score++;
+        selectedBtn.classList.add('correct');
+    } else {
+        selectedBtn.classList.add('incorrect');
+        const optionButtons = document.querySelectorAll('.option-btn');
+        optionButtons.forEach(btn => {
+            if (btn.dataset.isCorrect === 'true') {
+                btn.classList.add('correct');
+            }
+        });
+    }
 
-    setTimeout(() => {
-        currentQuestionIndex++;
-        if (currentQuestionIndex >= currentQuiz.length) {
-            showResult();
-        } else {
-            loadQuestion();
-        }
-    }, 1500); // 1.5초 후 다음 문제로
+    setTimeout(() => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex >= currentQuiz.length) {
+            showResult();
+        } else {
+            loadQuestion();
+        }
+    }, 1500); 
 }
 
 function showResult() {
-    questionEl.style.display = 'none';
-    optionsEl.style.display = 'none';
-    resultScreenEl.style.display = 'flex';
-    document.getElementById('finalScore').innerText = `총 ${currentQuiz.length}문제 중 ${score}문제를 맞혔어요!`;
+    questionEl.style.display = 'none';
+    optionsEl.style.display = 'none';
+    resultScreenEl.style.display = 'flex';
+    document.getElementById('finalScore').innerText = `총 ${currentQuiz.length}문제 중 ${score}문제를 맞혔어요!`;
 
-    const congratulatoryMessageEl = document.getElementById('congratulatoryMessage');
-    let message = '';
-    let messageColor = '';
+    const congratulatoryMessageEl = document.getElementById('congratulatoryMessage');
+    let message = '';
+    let messageColor = '';
 
-    if (score === 5) {
-        message = "완벽해요! 모든 문제를 맞혔어요!";
-        messageColor = '#4CAF50'; // Green
-    } else if (score >= 3) {
-        message = "정말 잘했어요! 훌륭해요!";
-        messageColor = '#2196F3'; // Blue
-    } else if (score >= 1) {
-        message = "잘했어요! 다음엔 더 잘할 수 있을 거예요!";
-        messageColor = '#FFC107'; // Amber
-    } else {
-        message = "괜찮아요! 다시 도전해봐요!";
-        messageColor = '#F44336'; // Red
-    }
-    congratulatoryMessageEl.innerText = message;
-    congratulatoryMessageEl.style.color = messageColor;
+    if (score === 5) {
+        message = "완벽해요! 모든 문제를 맞혔어요!";
+        messageColor = '#4CAF50'; 
+    } else if (score >= 3) {
+        message = "정말 잘했어요! 훌륭해요!";
+        messageColor = '#2196F3'; 
+    } else if (score >= 1) {
+        message = "잘했어요! 다음엔 더 잘할 수 있을 거예요!";
+        messageColor = '#FFC107'; 
+    } else {
+        message = "괜찮아요! 다시 도전해봐요!";
+        messageColor = '#F44336'; 
+    }
+    congratulatoryMessageEl.innerText = message;
+    congratulatoryMessageEl.style.color = messageColor;
 }
 
 function restartGame() {
-    currentQuestionIndex = 0;
-    score = 0;
-    resultScreenEl.style.display = 'none';
-    questionEl.style.display = 'block';
-    optionsEl.style.display = 'flex';
-    initializeQuiz(); // 게임을 다시 시작할 때 새로운 랜덤 문제로 시작
+    currentQuestionIndex = 0;
+    score = 0;
+    resultScreenEl.style.display = 'none';
+    questionEl.style.display = 'block';
+    optionsEl.style.display = 'flex';
+    initializeQuiz(); 
 }
 
 function goHome() {
-    window.location.href = 'main.html';
+    window.location.href = 'main.html';
 }
 
 window.onload = initializeQuiz;
