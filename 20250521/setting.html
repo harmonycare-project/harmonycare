@@ -41,6 +41,53 @@
             flex-direction: column;
             gap: 10px;
         }
+        
+        /* 토글 스위치 스타일 (추가/수정) */
+        .setting-item.toggle {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #ffca28;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        /* -- 토글 스위치 끝 -- */
 
         .setting-label {
             font-size: 30px;
@@ -128,6 +175,14 @@
             </div>
         </div>
 
+        <div class="setting-item toggle">
+            <div class="setting-label">📅 일정 항상 보기</div>
+            <label class="switch">
+                <input type="checkbox" id="alwaysShowScheduleToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
         <div class="setting-item">
             <div class="setting-label">🗣️ 목소리 속도: <span id="rateValue">1.0</span></div>
             <input type="range" id="voiceRate" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateRateLabel(this.value)">
@@ -147,29 +202,40 @@
     <script>
         // 변수 설정
         let speechRate = 1.0;
-        
-        // 1. 페이지 로드 시 이름 가져오기 (name.js의 로직을 여기에 맞게 적용)
-        window.addEventListener('DOMContentLoaded', () => {
-            // name.js에서 쓰는 키값 그대로 사용
-            const name = localStorage.getItem('harmonyUsername');
-            
-            // 설정 페이지에 있는 이름 표시 칸 가져오기
-            const nameDisplay = document.getElementById('userNameDisplay');
+        const toggle = document.getElementById('alwaysShowScheduleToggle');
 
-            if (name && nameDisplay) {
-                nameDisplay.textContent = name; // 이름 표시
-            } else if (nameDisplay) {
-                nameDisplay.textContent = "방문자"; // 이름이 없을 때
+        // 1. 페이지 로드 시 설정 및 이름 가져오기
+        window.addEventListener('DOMContentLoaded', () => {
+            // 이름 표시
+            const name = localStorage.getItem('harmonyUsername');
+            const nameDisplay = document.getElementById('userNameDisplay');
+            if (nameDisplay) {
+                nameDisplay.textContent = name || "방문자";
+            }
+
+            // 일정 보기 설정 로드 및 적용
+            const showSchedule = localStorage.getItem('alwaysShowSchedule') === 'true';
+            if (toggle) {
+                toggle.checked = showSchedule;
             }
         });
 
-        // 2. 목소리 속도 조절
+        // 2. 일정 보기 설정 저장
+        if (toggle) {
+            toggle.addEventListener('change', () => {
+                localStorage.setItem('alwaysShowSchedule', toggle.checked);
+                alert(`일정 ${toggle.checked ? '항상 보기' : '숨기기'}가 설정되었습니다.`);
+                // 변경 사항을 즉시 적용하기 위해 다른 페이지로 이동하거나 새로고침을 유도할 수 있음
+            });
+        }
+
+        // 3. 목소리 속도 조절
         function updateRateLabel(val) {
             document.getElementById('rateValue').innerText = val;
             speechRate = val;
         }
 
-        // 3. 말하기 함수
+        // 4. 말하기 함수 (현재 페이지에서는 사용되지 않지만, 다른 페이지와의 통일을 위해 유지)
         function speak(text) {
             window.speechSynthesis.cancel();
             const msg = new SpeechSynthesisUtterance(text);
@@ -178,14 +244,14 @@
             window.speechSynthesis.speak(msg);
         }
 
-        // 4. 초기화 함수
+        // 5. 초기화 함수
         function resetData() {
             if(confirm("정말로 모든 기록과 로그인 정보를 지우시겠습니까?")) {
                 localStorage.clear(); // 모든 저장 데이터 삭제
                 alert("초기화 되었습니다. 첫 화면으로 이동합니다.");
                 
                 // 홈(로그인) 화면 파일명
-                location.href = 'index.html'; 
+                location.href = 'beforetest.html'; 
             }
         }
 
@@ -199,4 +265,3 @@
     </script>
 </body>
 </html>
-
